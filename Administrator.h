@@ -8,7 +8,7 @@ private:
     String email;
     String department;
 public:
-    Administrator() = default;
+    Administrator();
 
     Administrator(const String& username, const String& password, const Date& regDate, const Date& lastVisit, const String& email, const String& department);
     Administrator(const Administrator& other) = default;
@@ -17,10 +17,17 @@ public:
 
     ~Administrator() = default;
 
+    void setEmail(const String& email);
+    void setDepartment(const String& department);
+
+    virtual void writeInFile(std::ofstream& output) const override;
+    virtual void readFromFile(std::ifstream& input) override;
+
     virtual User* clone() const override;
     virtual void print() const override;
 
-    bool isValidEmail(const String& str);
+    static bool isValidEmail(const String& str);
+    static bool isValidDepartment(const String& department);
 };
 
 #endif

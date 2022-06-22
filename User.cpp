@@ -1,6 +1,7 @@
 #include "User.h"
 
-User::User(const String& username, const String& password, const Date& regDate, const Date& lastVisit){
+User::User(const String& username, const String& password, const Date& regDate, const Date& lastVisit, const UserType type){
+    this->type = type;
     try{
         setUsername(username);
         setPassword(password);
@@ -51,9 +52,50 @@ const Date& User::getRegDate() const{
 const Date& User::getLastVisit() const{
     return this->lastVisit;
 }
+const UserType& User::getType() const{
+    return this->type;
+}
 
 void User::writeInFile(std::ofstream& output) const{    
-    output << "[" << username << "|" << password << "|" << lastVisit << "|" << regDate << "|";
+    output << (getType() == READER ? "R" : "A") << "]" << username << "|" << password << "|" << regDate << "|" << lastVisit << "|";
+}
+
+void User::readFromFile(std::ifstream& input){
+    unsigned bufferLen = 1024;
+    char buffer[bufferLen];
+    String username, password;
+    Date lastVisit, regDate;
+
+    input.getline(buffer, bufferLen, '|');
+    username = buffer;
+
+    input.getline(buffer, bufferLen, '|');
+    password = buffer;
+
+    input >> regDate;
+    input.get(buffer, 2);
+
+    input >> lastVisit;
+    input.get(buffer, 2);
+
+    try{
+        setUsername(username);
+        setPassword(password);
+        setLastVisit(lastVisit);
+        setRegDate(regDate);
+    }
+    catch(const char* msg){
+        std::cout << msg << std::endl;
+        return;
+    }
+}
+
+bool User::areSamePasswords(const String& p1, const String& p2){
+    if(p1 != p2){
+        std::cout << "This is not your password" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 void User::print() const{

@@ -63,7 +63,7 @@ void Book::setKeywords(const String& keywords){
 }
 
 void Book::setIsbn(const char* isbn){
-    if(isbn == nullptr || strlen(isbn) != 17 || isbn[0] != '9' || isbn[1] != '7' || (isbn[2] != '8' && isbn[2] != '9') || isbn[3] != '-' || isbn[15] != '-'){
+    if(!isValidIsbn(isbn)){
         throw "Invalid value for isbn!";
     }
     strcpy(this->isbn, isbn);
@@ -164,8 +164,10 @@ void Book::readFromFile(std::ifstream& input){
             std::cout << msg << std::endl;
         }
     }
+    else{
+        input.get(buffer, 2);
+    }
 
-    input.getline(buffer, bufferLen);
     try{
         setId(id);
         setTitle(title);
@@ -182,6 +184,41 @@ void Book::readFromFile(std::ifstream& input){
     }
 }
 
+void Book::readFromUser(){
+    String author, yearOfPublishingStr, keywords;
+    do{
+        std::cout << "Enter author: ";
+        std::cin >> author;
+    }while(author == "" || author == " ");
+
+    Paper::readFromUser();
+
+    if(this->hasIsbn_issn){
+        char isbn[18];
+        do{
+            std::cout << "Enter ISBN number: ";
+            std::cin.getline(isbn, 18);
+        }while(!isValidIsbn(isbn));
+        strcpy(this->isbn, isbn);
+    }
+
+    do{
+        std::cout << "Enter year of publishing: ";
+        std::cin >> yearOfPublishingStr;
+    }while(!(Date::isValidYear(yearOfPublishingStr)));
+
+    do{
+        std::cout << "Enter keywords: ";
+        std::cin >> keywords;
+    }while(keywords == " " || keywords == "");
+
+    int yearOfPubl = String::convertToNumber(yearOfPublishingStr);
+
+    this->author = author;
+    this->yearOfPublishing = yearOfPubl;
+    this->keywords = keywords;
+}
+
 void Book::print() const{
     Paper::print();
     if(hasIsbn_issn)
@@ -192,6 +229,14 @@ void Book::print() const{
 
 Paper* Book::clone() const{
     return new Book(*this);
+}
+
+bool Book::isValidIsbn(const char* isbn){
+    if(isbn == nullptr || strlen(isbn) != 17 || isbn[0] != '9' || isbn[1] != '7' || (isbn[2] != '8' && isbn[2] != '9') || isbn[3] != '-' || isbn[15] != '-'){
+        std::cout << "Invalid ISBN number" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 // BorrowedBook::BorrowedBook(const String& title, const String& publisher, const String& genre, const String& description, float rating, 

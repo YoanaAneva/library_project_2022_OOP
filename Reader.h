@@ -23,9 +23,16 @@ public:
 
     ~Reader();
 
-    void addItemToList(Paper* newItem);
+    void borrowItem(Paper* newItem);
+    void addItemToList(const BorrowedPaper& newItem);
+
+    void removeItemFromList(unsigned id);
+
+    const BorrowedPaper& getBItem(unsigned ind) const; 
+    unsigned getBItemsCount() const;
 
     virtual void writeInFile(std::ofstream& output) const override;
+    virtual void readFromFile(std::ifstream& input) override;
 
     virtual User* clone() const override;
     virtual void print() const override;

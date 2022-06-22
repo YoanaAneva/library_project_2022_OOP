@@ -16,8 +16,13 @@ public:
     // void writeInBin(std::ofstream& output);
     // void readFromBin(std::ifstream& input);
 
+    const String& getAuthor() const;
+    const String& getKeywords() const;
+
     friend std::ostream& operator<<(std::ostream& output, const Article& article);
     friend std::istream& operator>>(std::istream& input, Article& article);
+
+    void readFromUser();
 
     void print() const;
 };
@@ -47,15 +52,23 @@ public:
     void setIssn(const char* issn);
     void setContent(const Article* articles, int articlesCount);
 
+    const String& getDatePublishing() const;
+    unsigned getIssue() const;
+    const char* getIssn() const;
+    const Article* getContent() const;
+    unsigned getArticlesCount() const;
 
     void writeInBin(std::ofstream& output);
     static void readFromBin(std::ifstream& input, Series& Series);
 
     virtual void writeInFile(std::ofstream& output) const override;
     virtual void readFromFile(std::ifstream& input) override;
+    virtual void readFromUser() override;
 
     virtual Paper* clone() const override;
     virtual void print() const override;
+
+    static bool isValidIssn(const char* issn);
 };
 
 

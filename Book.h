@@ -39,9 +39,12 @@ public:
 
     virtual void writeInFile(std::ofstream& output) const override;
     virtual void readFromFile(std::ifstream& input) override;
+    virtual void readFromUser() override;
 
     virtual void print() const override;
     virtual Paper* clone() const override;
+
+    static bool isValidIsbn(const char* isbn);
 };
 
 

@@ -1,0 +1,18 @@
+[R]ivan123|123456789abc|2022-06-22|2022-07-22|1
+B[5|Harry Potter|J.K. Rowling|Helikon|adventures|quite childish and unoriginal story|2001|magician, school, don't bother|2.3|0]2022-06-22|2022-07-22]
+
+[R]goshi69|123456789abc|2022-06-22|2022-07-22|3
+B[1|C++ book|Ivan Ivanov|Ciela|textbook|boring|1997|c++, programming, for smart kids|3.5|1|978-3-0453-8499-9]2022-06-22|2022-07-22
+S[3|Vogue|Vogue|fashion|the latest trends and celebrity bullshit|2022-4|4|4.6|0|3
+{How to loose 10pds in a week/Gosho/10pounds, fat, skinny}
+{Madona has a new boyfriend/AK/hot, shocking, much younger than her}
+{The food you should eat according to the moon phase/L.S./potatoes, astrology, sun}]2022-06-22|2022-07-22
+B[2|Me|Me AK|Me|Autobiography|book about me|2022|me, myself, I|3.1|0]2022-06-22|2022-07-22]
+
+[R]iv_it123|7589437iii|2022-06-22|2022-07-22|1
+S[4|National Geographic|NG|photojournalism|travel, educational, documentary magazine|2020-09|45|4.8|1|3226-0504|2
+{How do we find shipwrecks?/Linda and Amy/adventures, treasures}
+{The world of lemurs/Andy Wooden/lemurs, into the wild}]2022-06-22|2022-07-22]
+
+[A]pesho_we|2489|2022-06-22|2022-07-22|pesho1@gmail.com|Series]
+

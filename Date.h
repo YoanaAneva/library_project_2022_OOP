@@ -36,12 +36,12 @@ public:
     friend std::ostream& operator<<(std::ostream&, const Date& date);
     friend std::istream& operator>>(std::istream&, Date& date);
 
-    bool operator==(const Date& other);
-    bool operator!=(const Date& other);
-    bool operator<(const Date& other);
-    bool operator<=(const Date& other);
-    bool operator>(const Date& other);
-    bool operator>=(const Date& other);
+    friend bool operator==(const Date& lhs, const Date& rhs);
+    friend bool operator!=(const Date& lhs, const Date& rhs);
+    friend bool operator<(const Date& lhs, const Date& rhs);
+    friend bool operator<=(const Date& lhs, const Date& rhs);
+    friend bool operator>(const Date& lhs, const Date& rhs);
+    friend bool operator>=(const Date& lhs, const Date& rhs);
 
     static bool isValid(int year, int month, int day);
     static bool isValidYear(const String& str);
@@ -50,6 +50,7 @@ public:
     static unsigned convertToYearMonth(const String& str);
 
     Date& addMonth();
+    Date& removeMonth();
 };
 
 #endif

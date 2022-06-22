@@ -8,7 +8,7 @@
 class String{
 private:
     char* data;
-    int size;
+    unsigned size;
 
     void copy(const String& other);
     void erase();
@@ -25,7 +25,7 @@ public:
     const char operator[](int index) const;
     char& operator[](int index);
 
-    int getSize() const;
+    unsigned getSize() const;
     const char* getData() const;
 
     friend std::ostream& operator<<(std::ostream& output, const String& str);
@@ -37,8 +37,10 @@ public:
     friend bool operator!=(const String& lhs, const String& rhs);
 
     String& operator+=(const String& rhs);
+    String& operator+=(char symbol);
 
-    static unsigned convertToNumber(const String& str);
+    static int convertToNumber(const String& str);
+    static String getSurname(const String& name);
 
     void writeInBin(std::ofstream& output);
     static void readFromBin(std::ifstream& input, String& str);

@@ -1,116 +1,39 @@
 #include "System.h"
 
-void System::copy(const System& other){
-    this->capacity = other.capacity;
-    this->size = other.size;
+// void System::getCommands(){
+//     bool stop = false;
+//     do{
+//         std::cout << "Enter your command: " << std::endl;
+//         char buffer[124];
+//         std::cin.getline(buffer, 124);
 
-    this->users = new User*[capacity];
-    for(int i = 0; i < size; ++i){
-        this->users[i] = other.users[i]->clone();
-    }
-}
+//         CommandInfo command = Commands::recognizeCommand(buffer);
+        
+//         switch(command.getType()){
+//             case Help : Commands::help(); break;
+//             case Exit : stop = true; break;
+//             case Login : Commands::login(userBase); break;
+//             case Logout : Commands::logout(userBase); break;
+//             case BooksAll : Commands::books_all(library); break;
+//             case BooksFind : Commands::books_find(command); break;
+//             case BooksAdd : Commands::books_add(); break;
+//             case BooksRemove : Commands::books_remove(); break;
+//             case SeriesAll : Commands::series_all(); break;
+//             case SeriesFind : Commands::series_find(command); break;
+//             case SeriesAdd : Commands::series_add(); break;
+//             case SeriesRemove : Commands::series_remove(); break;
+//             case ListAll : Commands::list_all(); break;
+//             case ListFind : Commands::list_find(command); break;
+//             case ListInfo : Commands::list_info(command); break;
+//             case UserFind : Commands::user_find(command); break;
+//             case UserAdd : Commands::user_add(command); break;
+//             case UserRemove : Commands::user_remove(command); break;
+//             case UserChange : Commands::user_change(command); break;
+//             case Take : Commands::take(command); break;
+//             case Return : Commands::return_(command); break;
+//             case Invalid : std::cout << "Try again" << std::endl; break;
+//             default : stop = true;
+//     } 
 
-void System::resize(){
-    capacity *= 2;
-
-    User** bigger = new User*[capacity];
-    for(int i = 0; i < size; ++i){
-        bigger[i] = users[i]->clone();
-    }
-
-    erase();
-    this->users = bigger;
-}
-
-void System::erase(){
-    for(int i = 0; i < size; ++i){
-        delete users[i];
-    }
-    delete[] users;
-}
-
-System::System(){
-    this->capacity = 16;
-    this->size = 0;
-
-    this->users = new User*[capacity];
-}
-
-System::System(User** users, int usersCount){
-    this->capacity = usersCount + 64;
-    this->size = usersCount;
-
-    this->users = new User*[capacity];
-    for(int i = 0; i < size; ++i){
-        this->users[i] = users[i]->clone();
-    }
-}
-
-System::System(const System& other){
-    copy(other);
-}
-
-System& System::operator=(const System& other){
-    if(this != &other){
-        erase();
-        copy(other);
-    }
-    return *this;
-}
-
-System::~System(){
-    erase();
-}
-
-unsigned System::getSize() const { return this->size; }
-
-bool System::addUser(User* user){
-    if(size >= capacity){
-        resize();
-    }
-
-    users[size] = user->clone();
-    ++size;
-    return true;
-}
-
-bool System::removeUser(const String& username){
-    if(!sameUsernameExists(username)){
-        std::cout << "No user with username: " << username << " exists in our system!" << std::endl;
-        return false;
-    }
-
-    for(int i = 0; i < size; ++i){
-        if(users[i]->getUsername() == username){
-            for(int j = i; j < size - 1; ++j){
-                users[j] = users[j + 1]->clone();
-            }
-        }
-    }
-    --size;
-    return true;
-}
-
-
-bool System::sameUsernameExists(const String& username){
-    for(int i = 0; i < size; ++i){
-        if(users[i]->getUsername() == username)
-            return true;
-    }
-    return false;
-}
-
-bool System::samePasswordExists(const String& password){
-    for(int i = 0; i < size; ++i){
-        if(users[i]->getPassword() == password)
-            return true;
-    }
-    return false;
-}
-
-void System::print() const {
-    for(int i = 0; i < size; ++i){
-        users[i]->print();
-    }
-}
-
+//    }while(!stop);
+// }

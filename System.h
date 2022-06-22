@@ -1,36 +1,22 @@
 #ifndef SYSTEM_H_INCLUDED
 #define SYSTEM_H_INCLUDED
 
-#include "Reader.h"
-#include "Administrator.h"
+#include "Library.h"
+#include "UserBase.h"
+#include "Commands.h"
 
 class System{
 private:
-    User** users;
-    unsigned size;
-    unsigned capacity;
-
-    void copy(const System& other);
-    void resize();
-    void erase();
-public:
-    System();
-    System(User** users, int usersCount);
+    Library library;
+    UserBase userBase;
 
     System(const System& other);
     System& operator=(const System& other);
 
-    ~System();
+public:
+    System() = default;
 
-    unsigned getSize() const;
-
-    bool addUser(User* user);
-    bool removeUser(const String& username);
-
-    bool sameUsernameExists(const String& username);
-    bool samePasswordExists(const String& password);
-
-    void print() const;
+    void getCommands();
 };
 
 #endif

@@ -10,9 +10,12 @@ class Library{
 private:
     Paper** catalog;
 
-    unsigned size;
-    unsigned capacity;
+    unsigned catalogSize;
+    unsigned catalogCapacity;
 
+    unsigned dividerInd;
+
+public:
     void copy(const Library& other);
     void resize();
     void erase();
@@ -26,11 +29,20 @@ public:
 
     ~Library();
 
-    void addItemToCatalog(Paper* newItem);
-    void removeItemFromCatalog(const String& title);
+    Paper* operator[](int index) const;
+    Paper*& operator[](int index);
 
-    void writeInFile(std::ofstream& output) const;
-    void createFromFile();
+    Paper* getItemById(unsigned id) const;
+    Paper** getItems() const;
+
+    unsigned getCatalogSize() const;
+    unsigned getDividerInd() const;
+
+    void addItemToCatalog(Paper* newItem);
+    void removeItemFromCatalog(unsigned id);
+
+    void writeInFile() const;
+    void readFromFile();
 
     void print() const;
 };

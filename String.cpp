@@ -13,9 +13,9 @@ void String::erase(){
 
 String::String(){
     // std::cout << "Default ctor called for string" << std::endl;
-    this->size = 1;
-    this->data = new char[2];
-    strcpy(this->data, " ");
+    this->size = 0;
+    this->data = new char[1];
+    this->data[0] = '\0';
 }
 
 String::String(const char* data){
@@ -42,7 +42,7 @@ String::~String(){
     this->erase();
 }
 
-int String::getSize() const {return this->size; }
+unsigned String::getSize() const {return this->size; }
 const char* String::getData() const {return this->data; }
 
 const char String::operator[](int index) const{
@@ -59,7 +59,7 @@ std::ostream& operator<<(std::ostream& output, const String& str){
 }
 
 std::istream& operator>>(std::istream& input, String& str){
-    int bufferSize = 1024;
+    unsigned bufferSize = 1024;
     char buffer[bufferSize];
     input.getline(buffer, bufferSize, '\n');
     str.size = strlen(buffer);
@@ -106,10 +106,27 @@ String& String::operator+=(const String& rhs){
     return *this;
 }
 
-unsigned String::convertToNumber(const String& str){
+String& String::operator+=(char symbol){
+    char* temp = new char[this->size + 2];
+    strcpy(temp, this->data);
+    temp[this->size] = symbol; 
+    temp[this->size + 1] = '\0';
+
+    this->data = new char[this->size + 2];
+    strcpy(this->data, temp);
+
+    this->size++;
+    delete[] temp;
+
+    return *this;
+}
+
+int String::convertToNumber(const String& str){
     for(int i = 0; i < str.size; ++i){
-        if(str[i] < '0' || str[i] > '9')
-            throw "Invalid number, negative or contains invalid symbols";
+        if(str[i] < '0' || str[i] > '9'){
+            std::cout << "Invalid number, negative or contains invalid symbols" << std::endl;
+            return -1;
+        }
     }
     int number = 0;
     for(int i = 0; i < str.size; ++i){
@@ -118,6 +135,26 @@ unsigned String::convertToNumber(const String& str){
     return number;
 }
 
+String String::getSurname(const String& name){
+    int spacesCount = 0;
+
+    for(int i = 0; name[i] != '\0'; ++i){
+        if(name[i] == ' ') 
+            spacesCount++;
+    }
+
+    unsigned numOfWords = spacesCount + 1;
+    String* words = new String[numOfWords];
+
+    int k = 0;
+    for(int i = 0; i < numOfWords; ++i){
+        for(; name[k] != ' '; ++k){
+            words[i] += name[k];
+        }
+        ++k;
+    }
+    return words[numOfWords - 1];
+}
 
 void String::writeInBin(std::ofstream& output){
     size_t dataLen = this->size + 1;

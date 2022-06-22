@@ -92,15 +92,15 @@ void Series::setIssue(int issue){
 }
 
 void Series::setIssn(const char* issn){
-    if(strlen(issn) != 9 || !isdigit(issn[0]) || !isdigit(issn[1]) || !isdigit(issn[2]) || !isdigit(issn[3]) || !isdigit(issn[5]) || !isdigit(issn[6]) || !isdigit(issn[7]) || !isdigit(issn[8]) || issn[4] != '-'){
+    if(!isValidIssn(issn)){
         throw "Invalid value for ISSN!";
     }
     strcpy(this->issn, issn);
 }
 
 void Series::setContent(const Article* articles, int articlesCount){
-    if(articlesCount == 0 || articles == nullptr){
-        throw "Invalid value for articles(no articles)!";
+    if(articles == nullptr){
+        throw "Invalid value for articles!";
     }
     this->content = new Article[articlesCount];
     for(int i = 0; i < articlesCount; i++){
@@ -108,6 +108,12 @@ void Series::setContent(const Article* articles, int articlesCount){
     }
     this->articlesCount = articlesCount;
 }
+
+const String& Series::getDatePublishing() const{ return this->datePublishing; }
+unsigned Series::getIssue() const{ return this->issue; }
+const char* Series::getIssn() const{ return this->issn; }
+const Article* Series::getContent() const{ return this->content; }
+unsigned Series::getArticlesCount() const{ return this->articlesCount; }
 
 Paper* Series::clone() const{
     return new Series(*this);
@@ -122,7 +128,7 @@ void Series::writeInFile(std::ofstream& output) const{
 
     for(int i = 0; i < articlesCount; ++i){
         output << "{" << content[i] << "}";
-        
+
         if(i == articlesCount - 1)
             output << "]";
         else
@@ -181,7 +187,6 @@ void Series::readFromFile(std::ifstream& input){
     if(hasIsbn_issn){
         char issn[10];
         input.getline(issn, 10, '|');
-        std::cout << issn << std::endl;
         try{
             setIssn(issn);
         }
@@ -201,7 +206,9 @@ void Series::readFromFile(std::ifstream& input){
         if(i == articlesCount - 1){
             input.get(buffer, 2);
         }
-        input.getline(buffer, bufferLen);
+        else{
+            input.getline(buffer, bufferLen);
+        }
     }
 
     try{
@@ -220,6 +227,59 @@ void Series::readFromFile(std::ifstream& input){
     }
 }
 
+void Series::readFromUser(){
+    String yearOfPubl, monthOfPubl, issueStr, articlesCountStr;
+    int issue, articlesCount;
+    
+    Paper::readFromUser();
+
+    if(hasIsbn_issn){
+        char issn[10];
+        do{
+            std::cout << "Enter ISSN number: ";
+            std::cin.getline(issn, 10);
+        }while(!isValidIssn(issn));
+        strcpy(this->issn, issn);
+    }
+
+    do{
+        std::cout << "Enter year of publishing: ";
+        std::cin >> yearOfPubl;
+    }while(!Date::isValidYear(yearOfPubl));
+
+    do{
+        std::cout << "Enter month of publishing: ";
+        std::cin >> monthOfPubl;
+    }while(!Date::isValidMonth(monthOfPubl));
+
+    do{
+        std::cout << "Enter issue: ";
+        std::cin >> issueStr;
+        issue = String::convertToNumber(issueStr);
+    }while(issue == -1);
+    
+    do{
+        std::cout << "Enter number of articles: ";
+        std::cin >> articlesCountStr;
+        articlesCount = String::convertToNumber(articlesCountStr);
+    }while(articlesCount == -1);
+
+    Article articles[articlesCount];
+    for(int i = 0; i < articlesCount; ++i){
+        articles[i].readFromUser();
+    }
+
+    String datePubl;
+    datePubl += yearOfPubl; datePubl += '-';
+    if(monthOfPubl.getSize() == 1){
+        datePubl += '0';
+    }
+    datePubl += monthOfPubl;
+
+    this->datePublishing = datePubl;
+    this->issue = issue;
+    setContent(articles, articlesCount);
+}
 
 // void Periodic::writeInBin(std::ofstream& output){
 //     title.writeInBin(output);
@@ -273,6 +333,14 @@ void Series::readFromFile(std::ifstream& input){
 //     delete[] as;
 // }
 
+bool Series::isValidIssn(const char* issn){
+    if(strlen(issn) != 9 || !isdigit(issn[0]) || !isdigit(issn[1]) || !isdigit(issn[2]) || !isdigit(issn[3]) || !isdigit(issn[5]) || !isdigit(issn[6]) || !isdigit(issn[7]) || !isdigit(issn[8]) || issn[4] != '-'){
+        std::cout << "Invalid value for ISSN!" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 void Series::print() const{
     Paper::print();
     std::cout << datePublishing << '|' << issue << '|' << (hasIsbn_issn ? issn : "") << std::endl << "Content:" << std::endl;
@@ -286,6 +354,14 @@ Article::Article(const String& header, const String& author, const String& keywo
     this->header = header;
     this->author = author;
     this->keywords = keywords;
+}
+
+const String& Article::getAuthor() const{
+    return this->author;
+}
+
+const String& Article::getKeywords() const{
+    return this->keywords;
 }
 
 // void Article::writeInBin(std::ofstream& output){
@@ -322,6 +398,29 @@ std::istream& operator>>(std::istream& input, Article& article){
     article.keywords = buffer;
 
     return input;
+}
+
+void Article::readFromUser(){
+    String header, author, keywords;
+
+    do{
+        std::cout << "Enter article header: ";
+        std::cin >> header;
+    }while(header == "" || header == " ");
+
+    do{
+        std::cout << "Enter article author: ";
+        std::cin >> author;
+    }while(author == "" || author == " ");
+
+    do{
+        std::cout << "Enter article keywords: ";
+        std::cin >> keywords;
+    }while(keywords == "" || keywords == " ");
+
+    this->header = header;
+    this->author = author;
+    this->keywords = keywords;
 }
 
 // BorrowedSeries::BorrowedSeries(const String& title, const String& publisher, const String& genre, const String& description, float rating, 

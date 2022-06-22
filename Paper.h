@@ -21,6 +21,8 @@ protected:
 
     Type type;
 
+    bool isTaken;
+
 private:
     void copy(const Paper& other);
 
@@ -47,6 +49,7 @@ public:
     void setRating(float rating);
     void setId(int id);
     void setHasIsbn_issn(bool hasIsbn);
+    void setIsTaken(bool isTaken);
 
     static void setUniqueNumLib(int uniqueNum);
 
@@ -58,14 +61,23 @@ public:
     unsigned getId() const;
     const Type& getType() const;
     bool showHasIsbn_issn() const;
+    bool getIsTaken() const;
 
     static unsigned getUniqueNumLib();
 
     virtual void writeInFile(std::ofstream& output) const = 0;
     virtual void readFromFile(std::ifstream& input) = 0;
+    virtual void readFromUser();
+
+    void listAll() const;
 
     virtual void print() const;
     virtual Paper* clone() const = 0;
+
+    bool isValidGenre(const String& genre);
+    bool isValidRating(const String& rating);
+
+    static bool isAmongKeywords(const String& keywords, const String& word);
 };
 
 #endif

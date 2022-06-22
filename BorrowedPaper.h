@@ -5,7 +5,7 @@
 #include "Book.h"
 #include "Series.h"
 
-class BorrowedPaper /*: virtual public Paper*/{
+class BorrowedPaper{
 private:
     Paper* paper;
     Date checkoutDate;
@@ -15,20 +15,26 @@ private:
 
 public:
     BorrowedPaper();
-    // BorrowedPaper(const String& title, const String& publisher, const String& genre, const String& description, 
-    // float rating, const Type& type, const Date& checkoutDate, const Date& returnDate);
+
     BorrowedPaper(Paper* paper, const Date& d1, const Date& d2);
     BorrowedPaper(Paper* paper);
 
     BorrowedPaper(const BorrowedPaper& other);
 
-    ~BorrowedPaper();
-
     BorrowedPaper& operator=(const BorrowedPaper& other);
 
-    Paper* getPaperPtr() const;
+    ~BorrowedPaper();
+
+    void setPaperPtr(Paper* paper);
+    void setCheckoutDate(const Date& checkoutDate);
+    void setReturnDate(const Date& returnDate);
+
+    Paper* getItemPtr() const;
+    const Date& getCheckoutDate() const;
+    const Date& getReturnDate() const;
 
     void writeInFile(std::ofstream& output) const;
+    void readFromFile(std::ifstream& input);
 
     // virtual BorrowedPaper* clone() const = 0;
     void print() const;

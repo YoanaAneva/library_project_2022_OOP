@@ -92,34 +92,34 @@ std::istream& operator>>(std::istream& input, Date& date){
     return input;
 }
 
-bool Date::operator==(const Date& other){
-    return (this->year == other.year && this->month == other.month && this->day == other.day);
+bool operator==(const Date& lhs, const Date& rhs){
+    return (lhs.year == rhs.year && lhs.month == rhs.month && lhs.day == rhs.day);
 }
 
-bool Date::operator!=(const Date& other){
-    return !(*this == other);
+bool operator!=(const Date& lhs, const Date& rhs){
+    return !(lhs == rhs);
 }
 
-bool Date::operator<(const Date& other){
-    if(this->year < other.year)
+bool operator<(const Date& lhs, const Date& rhs){
+    if(lhs.year < rhs.year)
         return true;
-    if(this->month < other.month && this->year == other.year)
+    if(lhs.month < rhs.month && lhs.year == rhs.year)
         return true;
-    if(this->day < other.day && this->month == other.month && this->year == other.year)
+    if(lhs.day < rhs.day && lhs.month == rhs.month && lhs.year == rhs.year)
         return true;
     return false;
 }
 
-bool Date::operator<=(const Date& other){
-    return (*this == other || *this < other);
+bool operator<=(const Date& lhs, const Date& rhs){
+    return (lhs == rhs || lhs < rhs);
 }
 
-bool Date::operator>(const Date& other){
-    return !(*this <= other);
+bool operator>(const Date& lhs, const Date& rhs){
+    return !(lhs <= rhs);
 }
 
-bool Date::operator>=(const Date& other){
-    return (*this == other || *this > other);
+bool operator>=(const Date& lhs, const Date& rhs){
+    return (lhs == rhs || lhs > rhs);
 }
 
 bool Date::isValid(int year, int month, int day){
@@ -130,28 +130,48 @@ bool Date::isValid(int year, int month, int day){
 }
 
 bool Date::isValidYear(const String& str){
-    if(str[0] != '1' && str[0] != '2' || str.getSize() != 4)
+    if(str[0] != '1' && str[0] != '2' || str.getSize() != 4){
+        std::cout << "Invalid value for year" << std::endl;
         return false;
-    for(int i = 1; i < 4; ++i){
-        if(str[i] < '0' || str[i] > '9')
-            return false;
     }
-    if(String::convertToNumber(str) > Date::getThisYear())
+    for(int i = 1; i < 4; ++i){
+        if(str[i] < '0' || str[i] > '9'){
+            std::cout << "Invalid value for year" << std::endl;
+            return false;
+        }
+    }
+    if(String::convertToNumber(str) > Date::getThisYear()){
+        std::cout << "Invalid value for year" << std::endl;
         return false;
+    }
 
     return true;
 }
 
 bool Date::isValidMonth(const String& str){
-    if(str[0] < '0' || str[0] > '9' || str[1] < '0' || str[1] > '9')
+    if(str.getSize() == 1 && (str[0] < '1' || str[0] > '9')){
+        std::cout << "Invalid value for month" << std::endl;
         return false;
-
-    if(str.getSize() < 1 || str.getSize() > 2)
+    }
+    if(str.getSize() == 2){
+        if(str[0] != '0' && str[0] != '1'){
+            std::cout << "Invalid value for month" << std::endl;
+            return false;
+        }
+        if(str[0] == '0' && (str[1] < '1' || str[1] > '9')){
+            std::cout << "Invalid value for month" << std::endl;
+            return false;
+        }
+        if(str[0] == '1' && str[1] != '1' && str[1] != '2'){
+            std::cout << "Invalid value for month" << std::endl;
+            return false;
+        }
+    }
+    if(str.getSize() > 2){
+        std::cout << "Invalid value for month" << std::endl;
         return false;
+    }
     
-    if(String::convertToNumber(str) < 1 || String::convertToNumber(str) > 12)
-        return false;
-
     return true;
 }
 
@@ -159,4 +179,9 @@ Date& Date::addMonth(){
     if(this->month == 12)
         this->year++;
     this->month++;
-}  
+} 
+Date& Date::removeMonth(){
+    if(this->month == 1)
+        this->year--;
+    this->month--;
+} 
