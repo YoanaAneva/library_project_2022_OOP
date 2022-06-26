@@ -4,7 +4,7 @@ void Library::copy(const Library& other){
     this->catalogCapacity = other.catalogCapacity;
     this->catalogSize = other.catalogSize;
 
-    this->catalog = new Paper*[catalogCapacity];
+    this->catalog = new Item*[catalogCapacity];
     for(int i = 0; i < catalogSize; ++i){
         this->catalog[i] = other.catalog[i]->clone();
     }
@@ -14,7 +14,7 @@ void Library::copy(const Library& other){
 void Library::resize(){
     this->catalogCapacity *= 2;
     
-    Paper** bigger = new Paper*[catalogCapacity];
+    Item** bigger = new Item*[catalogCapacity];
     for(int i = 0; i < catalogSize; ++i){
         bigger[i] = this->catalog[i]->clone();
     }
@@ -34,8 +34,8 @@ Library::Library(){
     this->catalogCapacity = 16;
     this->catalogSize = 1;
 
-    this->catalog = new Paper*[catalogCapacity];
-    Paper* divider = new Book("Divider1", " ", " ", "divides books from series", 0, "divider", 2000, " ");
+    this->catalog = new Item*[catalogCapacity];
+    Item* divider = new Book("Divider1", " ", " ", "divides books from series", 0, "divider", 2000, " ");
     catalog[0] = divider;
     dividerInd = 0;
 }
@@ -63,7 +63,7 @@ unsigned Library::getDividerInd() const {
     return this->dividerInd;
 }
 
-Paper* Library::operator[](int index) const{
+Item* Library::operator[](int index) const{
     if(index >= catalogSize){
         std::cout << "index out of bound" << std::endl;
         return this->catalog[dividerInd];
@@ -71,7 +71,7 @@ Paper* Library::operator[](int index) const{
     return this->catalog[index];
 }
 
-Paper*& Library::operator[](int index){
+Item*& Library::operator[](int index){
     if(index >= catalogSize){
         std::cout << "index out of bound" << std::endl;
         return this->catalog[dividerInd];
@@ -79,7 +79,7 @@ Paper*& Library::operator[](int index){
     return this->catalog[index];
 }
 
-Paper* Library::getItemById(unsigned id) const{
+Item* Library::getItemById(unsigned id) const{
     for(int i = 0; i < catalogSize; i++){
         if(catalog[i]->getId() == id){
             return catalog[i];
@@ -88,11 +88,11 @@ Paper* Library::getItemById(unsigned id) const{
     return nullptr;
 }
 
-Paper** Library::getItems() const{
+Item** Library::getItems() const{
     return this->catalog;
 }
 
-void Library::addItemToCatalog(Paper* newItem){
+void Library::addItemToCatalog(Item* newItem){
     if(catalogSize + 1 >= catalogCapacity)
         resize();
     if(newItem->getType() == BOOK){
@@ -133,6 +133,7 @@ void Library::addItemToCatalog(Paper* newItem){
                 }
                 catalog[i] = newItem->clone();
                 ++catalogSize;
+
                 return;
             }
         }
@@ -152,8 +153,6 @@ void Library::removeItemFromCatalog(unsigned id){
             return;
         }
     }
-    std::cout << "No item from our catalog matches id:" << id << std::endl;
-    return; 
 }
 
 void Library::writeInFile() const{
@@ -175,8 +174,8 @@ void Library::writeInFile() const{
     output.close();
 }
 
-void Library::readFromFile(){
-    std::ifstream input("library_catalog.txt");
+void Library::readFromFile(std::ifstream& input){
+    // std::ifstream input("library_catalog.txt");
     if(!input){
         std::cout << "Cannot open file library_catalog.txt for reading!" << std::endl;
         return;
@@ -201,7 +200,7 @@ void Library::readFromFile(){
         }
     }
 
-    input.close();
+    // input.close();
 }
 
 void Library::print() const{

@@ -1,6 +1,5 @@
 #include "Date.h"
 Date::Date(){
-    // std::cout << "Default ctor for Date" << std::endl;
     setNow();
 }
 
@@ -131,17 +130,17 @@ bool Date::isValid(int year, int month, int day){
 
 bool Date::isValidYear(const String& str){
     if(str[0] != '1' && str[0] != '2' || str.getSize() != 4){
-        std::cout << "Invalid value for year" << std::endl;
+        std::cout << "\nInvalid value for year\n\n";
         return false;
     }
     for(int i = 1; i < 4; ++i){
         if(str[i] < '0' || str[i] > '9'){
-            std::cout << "Invalid value for year" << std::endl;
+            std::cout << "\nInvalid value for year\n\n";
             return false;
         }
     }
     if(String::convertToNumber(str) > Date::getThisYear()){
-        std::cout << "Invalid value for year" << std::endl;
+        std::cout << "\nInvalid value for year\n\n";
         return false;
     }
 
@@ -150,25 +149,25 @@ bool Date::isValidYear(const String& str){
 
 bool Date::isValidMonth(const String& str){
     if(str.getSize() == 1 && (str[0] < '1' || str[0] > '9')){
-        std::cout << "Invalid value for month" << std::endl;
+        std::cout << "\nInvalid value for month\n\n";
         return false;
     }
     if(str.getSize() == 2){
         if(str[0] != '0' && str[0] != '1'){
-            std::cout << "Invalid value for month" << std::endl;
+            std::cout << "\nInvalid value for month\n\n";
             return false;
         }
         if(str[0] == '0' && (str[1] < '1' || str[1] > '9')){
-            std::cout << "Invalid value for month" << std::endl;
+            std::cout << "\nInvalid value for month\n\n";
             return false;
         }
         if(str[0] == '1' && str[1] != '1' && str[1] != '2'){
-            std::cout << "Invalid value for month" << std::endl;
+            std::cout << "\nInvalid value for month\n\n";
             return false;
         }
     }
     if(str.getSize() > 2){
-        std::cout << "Invalid value for month" << std::endl;
+        std::cout << "\nInvalid value for month\n\n";
         return false;
     }
     
@@ -185,3 +184,44 @@ Date& Date::removeMonth(){
         this->year--;
     this->month--;
 } 
+
+Date Date::convertToDate(const String& str){
+    String dayStr, monthStr, yearStr;
+    int dashesCout = 0, year, month, day;
+
+    for(int i = 0; i < str.getSize(); ++i){
+        if(str[i] == '-')
+            dashesCout++;
+    }
+
+    int i = 0;
+    for(; str[i] != '-'; ++i){
+        yearStr += str[i];
+    }
+    year = String::convertToNumber(yearStr);
+
+    ++i;
+
+    if(dashesCout == 2){
+        for(; str[i] != '-'; ++i){
+            monthStr += str[i];
+        }
+        month = String::convertToNumber(monthStr);
+
+        ++i;
+
+        for(; i < str.getSize(); ++i){
+            dayStr += str[i];
+        }
+        day = String::convertToNumber(dayStr);
+
+        return Date(year, month, day);
+    }
+
+    for(; i < str.getSize(); ++i){
+        monthStr += str[i];
+    }
+    month = String::convertToNumber(monthStr);      
+   
+    return Date(year, month, 1);
+}

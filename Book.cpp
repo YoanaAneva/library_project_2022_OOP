@@ -1,14 +1,12 @@
 #include "Book.h"
 
-Book::Book() : Paper(){
+Book::Book() : Item(){
     this->type = BOOK;
-    this->yearOfPublishing = 1;
-    strcpy(this->isbn, "978-0-0000-0000-0");
-    this->hasIsbn_issn = false;
+    this->isbn = "978-0-0000-0000-0";
 }
 
-Book::Book(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& author, int yearOfPublishing, const String& keywords, const char* isbn) : 
-Paper(title, publisher, genre, description, rating, BOOK){
+Book::Book(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& author, int yearOfPublishing, const String& keywords, const String& isbn) : 
+Item(title, publisher, genre, description, rating, BOOK){
     this->hasIsbn_issn = true;
     try{
         setAuthor(author);
@@ -16,8 +14,8 @@ Paper(title, publisher, genre, description, rating, BOOK){
         setKeywords(keywords);
         setIsbn(isbn);
     }
-    catch(const std::invalid_argument& msg){
-        std::cout << msg.what() << " Object with default values is going to be created!" << std::endl;
+    catch(const char* msg){
+        std::cout << msg <<  "Object with default values is going to be created!" <<std::endl;
         setAuthor("Unknown");
         setYearOfPublishing(1);
         setKeywords("Unknown");
@@ -26,7 +24,7 @@ Paper(title, publisher, genre, description, rating, BOOK){
 }
 
 Book::Book(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& author, int yearOfPublishing, const String& keywords) : 
-Paper(title, publisher, genre, description, rating, BOOK){
+Item(title, publisher, genre, description, rating, BOOK){
     this->hasIsbn_issn = false;
     try{
         setAuthor(author);
@@ -49,7 +47,7 @@ void Book::setAuthor(const String& author){
 }
 
 void Book::setYearOfPublishing(int yearOfPublishing){
-    if(yearOfPublishing <= 0){
+    if(yearOfPublishing <= 1000 || yearOfPublishing > Date::getThisYear()){
         throw "Invalid value for year of publishing!";
     }
     this->yearOfPublishing = yearOfPublishing;
@@ -62,49 +60,22 @@ void Book::setKeywords(const String& keywords){
     this->keywords = keywords;
 }
 
-void Book::setIsbn(const char* isbn){
+void Book::setIsbn(const String& isbn){
     if(!isValidIsbn(isbn)){
         throw "Invalid value for isbn!";
     }
-    strcpy(this->isbn, isbn);
+    this->isbn = isbn;
 }
 
 
 const String& Book::getAuthor() const { return this->author; }
 int Book::getYearOfPublishing() const { return this->yearOfPublishing; }
 const String& Book::getKeywords() const { return this->keywords; }
-const char* Book::getIsbn() const { return this->isbn; }
-
-
-// void Book::writeBookInBin(std::ofstream& output){
-//     this->author.writeInBin(output);
-//     this->title.writeInBin(output);
-//     this->publisher.writeInBin(output);
-//     this->genre.writeInBin(output);
-//     this->description.writeInBin(output);
-//     output.write(reinterpret_cast<const char*> (&yearOfPublishing), sizeof(yearOfPublishing));
-//     this->keywords.writeInBin(output);
-//     output.write(reinterpret_cast<const char*> (&rating), sizeof(rating));
-//     output.write(reinterpret_cast<const char*> (&uniqueNumLib), sizeof(uniqueNumLib));
-//     output.write(isbn, 18);
-// }
-
-// void Book::readBookFromBin(std::ifstream& input, Book& book){
-//     String::readFromBin(input, book.author);
-//     String::readFromBin(input, book.title);
-//     String::readFromBin(input, book.publisher);
-//     String::readFromBin(input, book.genre);
-//     String::readFromBin(input, book.description);
-//     input.read(reinterpret_cast<char*> (&book.yearOfPublishing), sizeof(book.yearOfPublishing));
-//     String::readFromBin(input, book.keywords);
-//     input.read(reinterpret_cast<char*> (&book.rating), sizeof(book.rating));
-//     input.read(reinterpret_cast<char*> (&uniqueNumLib), sizeof(uniqueNumLib));
-//     input.read(book.isbn, 18);
-// }
+const String& Book::getIsbn() const { return this->isbn; }
 
 void Book::writeInFile(std::ofstream& output) const{
-    output << "B[" << this->id << "|" << this->title << "|" << this->author << "|" << this->publisher << "|" << this->genre << "|" << this->description << "|" 
-    << this->yearOfPublishing << "|" << this->keywords << "|" << this->rating << "|" << this->hasIsbn_issn;
+    output << "B[" << id << "|" << title << "|" << author << "|" << publisher << "|" << genre << "|" << description << "|" 
+    << yearOfPublishing << "|" << keywords << "|" << rating << "|" << isTaken << "|" << hasIsbn_issn;
     if(hasIsbn_issn){
         output << "|" << isbn << "]";
     }
@@ -120,7 +91,7 @@ void Book::readFromFile(std::ifstream& input){
     input.get(buffer, 2);
 
     String title, author, publisher, genre, description, keywords;
-    unsigned id, yearOfPublishing, hasIsbn_issn;
+    unsigned id, yearOfPublishing, isTaken, hasIsbn_issn;
     float rating;
 
     input >> id;
@@ -151,6 +122,10 @@ void Book::readFromFile(std::ifstream& input){
     setRating(rating);
 
     input.get(buffer, 2);
+
+    input >> isTaken;
+    input.get(buffer, 2);
+
     input >> hasIsbn_issn;
     
     if(hasIsbn_issn){
@@ -177,38 +152,45 @@ void Book::readFromFile(std::ifstream& input){
         setDescription(description);
         setYearOfPublishing(yearOfPublishing);
         setKeywords(keywords);
+        setIsTaken(isTaken);
         setHasIsbn_issn(hasIsbn_issn);
     }
     catch(const char* msg){
-        std::cout << msg << std::endl;
+        std::cout << msg << "Default values are going to be set\n\n";
+        setTitle("Unknown");
+        setAuthor("Unknown");
+        setPublisher("Unknown");
+        setGenre("Unknown");
+        setDescription("Unknown");
+        setYearOfPublishing(1000);
+        setKeywords("Unknown");
     }
 }
 
 void Book::readFromUser(){
     String author, yearOfPublishingStr, keywords;
     do{
-        std::cout << "Enter author: ";
+        std::cout << "\nEnter author: ";
         std::cin >> author;
     }while(author == "" || author == " ");
 
-    Paper::readFromUser();
+    Item::readFromUser();
 
     if(this->hasIsbn_issn){
-        char isbn[18];
         do{
-            std::cout << "Enter ISBN number: ";
-            std::cin.getline(isbn, 18);
+            std::cout << "\nEnter ISBN number: ";
+            std::cin >> isbn;
         }while(!isValidIsbn(isbn));
-        strcpy(this->isbn, isbn);
+        this->isbn = isbn;
     }
 
     do{
-        std::cout << "Enter year of publishing: ";
+        std::cout << "\nEnter year of publishing: ";
         std::cin >> yearOfPublishingStr;
     }while(!(Date::isValidYear(yearOfPublishingStr)));
 
     do{
-        std::cout << "Enter keywords: ";
+        std::cout << "\nEnter keywords: ";
         std::cin >> keywords;
     }while(keywords == " " || keywords == "");
 
@@ -220,71 +202,21 @@ void Book::readFromUser(){
 }
 
 void Book::print() const{
-    Paper::print();
+    Item::print();
     if(hasIsbn_issn)
         std::cout << author << "|" <<  yearOfPublishing << "|" << keywords << "|" << isbn << std::endl;
     else
         std::cout << author << "|" <<  yearOfPublishing << "|" << keywords << std::endl;
 }
 
-Paper* Book::clone() const{
+Item* Book::clone() const{
     return new Book(*this);
 }
 
-bool Book::isValidIsbn(const char* isbn){
-    if(isbn == nullptr || strlen(isbn) != 17 || isbn[0] != '9' || isbn[1] != '7' || (isbn[2] != '8' && isbn[2] != '9') || isbn[3] != '-' || isbn[15] != '-'){
-        std::cout << "Invalid ISBN number" << std::endl;
+bool Book::isValidIsbn(const String& isbn){
+    if(isbn.getData() == nullptr || isbn.getSize() != 17 || isbn[0] != '9' || isbn[1] != '7' || (isbn[2] != '8' && isbn[2] != '9') || isbn[3] != '-' || isbn[15] != '-'){
+        std::cout << "\nInvalid ISBN number: correct form: 978-0-0000-0000-0 where 0 can be any number\n\n";
         return false;
     }
     return true;
 }
-
-// BorrowedBook::BorrowedBook(const String& title, const String& publisher, const String& genre, const String& description, float rating, 
-//     const String& author, int yearOfPublishing, const String& keywords, const char* isbn, const Date& checkoutDate, const Date& returnDate) :
-//     Paper(title, publisher, genre, description, rating, BOOK),
-//     Book("will", "be", "ignored", "!", 0, author, yearOfPublishing, keywords, isbn),
-//     BorrowedPaper(" ", " ", " ", " ", 0, BOOK, checkoutDate, returnDate) {}
-
-
-// BorrowedBook::BorrowedBook(const String& title, const String& publisher, const String& genre, const String& description, float rating, 
-//     const String& author, int yearOfPublishing, const String& keywords, const Date& checkoutDate, const Date& returnDate) :
-//     Paper(title, publisher, genre, description, rating, BOOK),
-//     Book("will", "be", "ignored", "!", 0, author, yearOfPublishing, keywords),
-//     BorrowedPaper(title, publisher, genre, description, rating, BOOK, checkoutDate, returnDate) {}
-
-// BorrowedBook::BorrowedBook(const Book& book) : Paper(book), Book(book){
-//     // this->title = book.getTitle();
-//     // this->publisher = book.getPublisher();
-//     // this->genre = book.getGenre();
-//     // this->description = book.getDescription();
-//     // this->rating = book.getRating();
-//     // this->author = book.getAuthor();
-//     // this->yearOfPublishing = book.getYearOfPublishing();
-//     // this->keywords = book.getKeywords();
-   
-//     // this->checkoutDate = Date::getNow();
-//     // this->returnDate = checkoutDate.addMonth(); 
-//     // this->id = book.getId();
-
-//     // this->type = BOOK;   
-//     // this->hasIsbn_issn = book.showHasIsbn_issn();
-//     // char isbn[18];
-//     // if(book.showHasIsbn_issn())
-//     //     strcpy(this->isbn, book.getIsbn());
-//     // else
-//     //     strcpy(this->isbn, "000-0-0000-0000-0"
-
-//     this->checkoutDate = Date::getNow();
-//     this->returnDate = checkoutDate;
-//     this->returnDate.addMonth(); 
-//     this->id = book.getId();
-// }
-
-// BorrowedPaper* BorrowedBook::clone() const{
-//     return new BorrowedBook(*this);
-// }
-
-// void BorrowedBook::print() const{
-//     Book::print();
-//     std::cout << checkoutDate << "|" << returnDate << std::endl;
-// }

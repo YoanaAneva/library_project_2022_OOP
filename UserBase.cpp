@@ -49,18 +49,6 @@ UserBase::UserBase(){
     this->loggedUser = nullptr;
 }
 
-// UserBase::UserBase(User** users, int usersCount){
-//     this->usersCapacity = usersCount + 8;
-//     this->usersCount = usersCount;
-
-//     this->users = new User*[usersCapacity];
-//     for(int i = 0; i < usersCount; ++i){
-//         this->users[i] = users[i]->clone();
-//     }
-//     this->hasLoggedIn = false;
-//     this->loggedUser = nullptr;
-// }
-
 UserBase::UserBase(const UserBase& other){
     copy(other);
 }
@@ -84,8 +72,12 @@ User* UserBase::operator[](int index) const{
 void UserBase::setHasLoggedIn(bool hasLoggedIn){
     this->hasLoggedIn = hasLoggedIn;
 }
-void UserBase::logUser(const User* user){
+void UserBase::logInUser(const User* user){
     this->loggedUser = user->clone();
+}
+
+void UserBase::logOutUser(){
+    this->loggedUser = nullptr;
 }
 
 unsigned UserBase::getUsersCount() const { return this->usersCount; }
@@ -132,7 +124,7 @@ bool UserBase::removeUser(const String& username){
 }
 
 void UserBase::writeInFile() const{
-    std::ofstream output("users.txt");
+    std::ofstream output("user_base.txt");
 
     if(!output){
         std::cout << "Cannot open file users.txt for writing!" << std::endl;
@@ -140,6 +132,8 @@ void UserBase::writeInFile() const{
     }
 
     for(int i = 0; i < usersCount; ++i){
+        if(users[i]->getUsername() == "admin")
+            continue;
         output << "[";
         users[i]->writeInFile(output);
     }
@@ -147,8 +141,7 @@ void UserBase::writeInFile() const{
     output.close();
 }
 
-void UserBase::readFromFile(){
-    std::ifstream input("users.txt");
+void UserBase::readFromFile(std::ifstream& input){
 
     if(!input){
         std::cout << "Cannot open file users.txt for reading!" << std::endl;

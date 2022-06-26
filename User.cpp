@@ -9,8 +9,9 @@ User::User(const String& username, const String& password, const Date& regDate, 
         setLastVisit(lastVisit);
     }
     catch(const char* msg){
-        std::cout << msg << std::endl;
-        throw;
+        std::cout << msg << " Default values are going to be set" << std::endl;
+        setUsername("Unknown");
+        setPassword("Unknown");
     }
 }
 
@@ -27,10 +28,6 @@ void User::setPassword(const String& password){
     }
     this->password = password;
 }
-
-// void User::add(BorrowedPaper* p){
-//     return;
-// }
 
 void User::setRegDate(const Date& regDate){
     this->regDate = regDate;
@@ -85,14 +82,33 @@ void User::readFromFile(std::ifstream& input){
         setRegDate(regDate);
     }
     catch(const char* msg){
-        std::cout << msg << std::endl;
-        return;
+        std::cout << msg << "Default value are going to be set" << std::endl;
+        setUsername("Unknown");
+        setPassword("Unknown");
     }
 }
 
 bool User::areSamePasswords(const String& p1, const String& p2){
     if(p1 != p2){
-        std::cout << "This is not your password" << std::endl;
+        std::cout << "\nThis is not your password\n\n";
+        return false;
+    }
+    return true;
+}
+
+bool User::isValidPasswords(const String& str){
+    if(str.getSize() < 6){
+        std::cout << "\nPassword should contain at least 6 characters\n\n";
+        return false; 
+    }
+    bool containsDig = false;
+    for(int i = 0; i < str.getSize(); ++i){
+        if(str[i] >= '0' &&  str[i] <= '9'){
+            containsDig = true;
+        }
+    }
+    if(!containsDig){
+        std::cout << "\nPassword should contain a digit\n\n";
         return false;
     }
     return true;

@@ -12,7 +12,6 @@ void String::erase(){
 }
 
 String::String(){
-    // std::cout << "Default ctor called for string" << std::endl;
     this->size = 0;
     this->data = new char[1];
     this->data[0] = '\0';
@@ -25,7 +24,6 @@ String::String(const char* data){
 }
 
 String::String(const String& other){
-    // std::cout << "Copy ctor called for string" << std::endl;
     this->copy(other);
 }
 
@@ -38,7 +36,6 @@ String& String::operator=(const String& other){
 }
 
 String::~String(){
-    // std::cout << "Destructor called for string" << std::endl;
     this->erase();
 }
 
@@ -122,9 +119,9 @@ String& String::operator+=(char symbol){
 }
 
 int String::convertToNumber(const String& str){
-    for(int i = 0; i < str.size; ++i){
+    for(int i = 0; i < str.getSize(); ++i){
         if(str[i] < '0' || str[i] > '9'){
-            std::cout << "Invalid number, negative or contains invalid symbols" << std::endl;
+            std::cout << "\nInvalid number, negative or contains invalid symbols\n\n";
             return -1;
         }
     }
@@ -155,51 +152,3 @@ String String::getSurname(const String& name){
     }
     return words[numOfWords - 1];
 }
-
-void String::writeInBin(std::ofstream& output){
-    size_t dataLen = this->size + 1;
-    output.write(reinterpret_cast<const char*>(&dataLen), sizeof(dataLen));
-    output.write(this->data, dataLen);
-}
-
-void String::readFromBin(std::ifstream& input, String& str){
-    size_t dataLen;
-    input.read(reinterpret_cast<char*>(&dataLen), sizeof(dataLen));
-
-    delete[] str.data;
-    str.data = new char[dataLen];
-    input.read(str.data, dataLen);
-
-    int capacity;
-    input.read(reinterpret_cast<char*>(&capacity), sizeof(capacity));
-
-    str.size = dataLen - 1;
-}
-
-// int main(){
-    // String myStr("Hello world");
-    // String otherStr("Fuck you");
-
-    // std::ofstream output("String.bin", std::ios::binary);
-
-    // myStr.writeInBin(output);
-    // otherStr.writeInBin(output);
-
-    // output.close();
-
-    // String test1;
-    // String test2;
-
-    // std::ifstream input("String.bin", std::ios::binary);
-
-    // String::readFromBin(input, test2);
-    // String::readFromBin(input, test1);
-
-    // input.close();
-
-    // std::cout << test1 << std::endl;
-    // std::cout << test2 << std::endl;
-
-    // std::cout << (myStr != test1) << std::endl;
-    // std::cout << myStr << " " << test1 << std::endl;
-// }

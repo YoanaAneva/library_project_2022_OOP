@@ -6,8 +6,14 @@ Administrator::Administrator() : User(){
 
 Administrator::Administrator(const String& username, const String& password, const Date& regDate, const Date& lastVisit, const String& email, const String& department)
  : User(username, password, regDate, lastVisit, ADMINISTRATOR) {
-    this->email = email;
-    this->department = department;
+    try{
+        setEmail(email);
+        setDepartment(department);
+    }catch(const char* msg){
+        std::cout << msg << std::endl;
+        setEmail("Unknown");
+        setDepartment("Unknown");
+    }
 }
 
 void Administrator::setEmail(const String& email){
@@ -18,6 +24,9 @@ void Administrator::setEmail(const String& email){
 }
 
 void Administrator::setDepartment(const String& department){
+    if(!isValidDepartment(department)){
+        throw "Invalid department";
+    }
     this->department = department;
 }
 
@@ -89,8 +98,7 @@ bool Administrator::isValidEmail(const String& str){
         return false;
 
     if(str[0] == '.') 
-        return true;
-
+        return false;
 
     //characters with restrictions - "(),:;<>@[\] 
     for(int i = 0; i < localPartLen; ++i){
@@ -129,7 +137,7 @@ bool Administrator::isValidDepartment(const String& department){
         return false;
     }
     for(int i = 0; i < department.getSize(); ++i){
-        if((department[i] < 'A' || department[i] > 'Z') && (department[i] < 'a' || department[i] > 'z' && department[i] != ',' && department[i] != ' ')){
+        if((department[i] < 'A' || department[i] > 'Z') && (department[i] < 'a' || department[i] > 'z') && department[i] != ',' && department[i] != ' '){
             std::cout << "Invalid value for department" << std::endl;
             return false;
         }  

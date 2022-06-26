@@ -1,3 +1,6 @@
+[R]ioana|ioana123|2022-06-27|2022-06-27|1
+B[7|Alice in Wonderland|Lewis Carroll|Ciela|adventures|a magical story about a magic land|2003|children stories, adventures, classics|3.2|1|0]2022-06-27|2022-07-27]
+
 [R]georgi_123|123456789abc|2016-04-26|2022-05-29|2
 B[3|Me and My story|Ana K|Collins|Autobiography|Book about my life journey|2022|jouney, self discovery|3.1|0|0]2018-09-17|2018-12-02
 B[4|Harry Potter|J.K. Rowling|Helikon|adventures|Story about magic and adventures|2001|magician, school, don't bother|2.3|0|0]2019-02-05|2021-07-08]
@@ -25,8 +28,7 @@ S[11|Vogue|Conde Nast|fashion|The latest trends and celebrity news|2009-5|5|4.6|
 {The food you should eat according to the moon phase/L.S./healthy, astrology, moon}]2022-05-29|2022-06-01
 B[4|Harry Potter|J.K. Rowling|Helikon|adventures|Story about magic and adventures|2001|magician, school, don't bother|2.3|0|0]2019-02-05|2021-07-08]
 
-[A]admin|i<3c++|2020-12-03|2022-06-21|admin@gmail.com|Computer Science]
-
 [A]dimitar.ivanov|admin1123|2021-07-08|2022-04-29|dim_ivanov@gmail.com|Series]
 
 [A]ivailo_s|admin2123|2019-02-05|2022-02-15|ivailo.ivailo@abv.bg|Children Literature]
+

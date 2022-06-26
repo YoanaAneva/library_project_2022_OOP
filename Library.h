@@ -1,49 +1,72 @@
 #ifndef LIBRARY_H_INCLUDED
 #define LIBRARY_H_INCLUDED
 
-#include "Paper.h"
+#include "Item.h"
 #include "Book.h"
 #include "Series.h"
 
-
+///Клас, който съхранява информацията за всички артикули в библиотеката. Съдържа полиморфен контейнер от тип Item*. 
+///Може да се разглежда като саморазширяващ се масив от различни типове артикули, които се съхраняват сортирани.
+///@param catalog хетерогенен контейнер от тип Item*, съхраняващ артикулите @param catalogSize броят на артикулите в хетерогенния контейнер @param catalogCapacity капацитетът на хетерогенния контейнер
+/// @param dividerInd променлива, указваща къде се намира разделителят между книгите и печатните издания.
 class Library{
 private:
-    Paper** catalog;
+    Item** catalog;
 
     unsigned catalogSize;
     unsigned catalogCapacity;
 
     unsigned dividerInd;
 
-public:
+private:
     void copy(const Library& other);
     void resize();
     void erase();
 
 public:
+    ///Коструктор по подразбиране, указва капацитета, съзадава разделителя между книгите и печатните издания, заделя памет за масива от указатели.
     Library();
-    Library(Paper** items, int count);
+    ///Копиращ конструктор, използва функцията copy(), която за this->catalog[i] създава копие на данните, към които сочи всеки от указателите на other.catalog[i]. 
+    ///****************************************************************************
+    ///for(int i = 0; i < other.catalogSize; ++i)           
+    ///    this->catalog[i] = other.catalog[i]->clone();    
+    ///****************************************************************************
     Library(const Library& other);
 
     Library& operator=(const Library& other);
 
     ~Library();
 
-    Paper* operator[](int index) const;
-    Paper*& operator[](int index);
+    ///Предефинира оператора []. Връща указател от тип Item*, т.е. елемета от Item** catalog с посочения индекс.
+    Item* operator[](int index) const;
+    ///Предефинира оператора []. Връща референция към указател от тип Item*, т.е. референция към елементът от Item** с посочения индекс.
+    Item*& operator[](int index);
 
-    Paper* getItemById(unsigned id) const;
-    Paper** getItems() const;
+    ///Връща артикула с id, съответстващо на подаденото, ако такъв няма, се връща nullptr.
+    Item* getItemById(unsigned id) const;
+    ///Връща указатели към всички артикули в библиотеката. 
+    Item** getItems() const;
 
     unsigned getCatalogSize() const;
     unsigned getDividerInd() const;
 
-    void addItemToCatalog(Paper* newItem);
+    ///Добавя нов артикул, към полиморфния контейнер. Артикулите се държат сортирани, като първо са книгите, подредени по фамилия на автора, 
+    ///после са печатните издания, подредени по заглавие. Между двата вида артикули стои разделител от тип Book.
+    void addItemToCatalog(Item* newItem);
+
+    ///Премахва артикул от библиотеката по подаден идентификационен номер. Поради проверките, 
+    ///които се правят във функцията Commands::books_remove(Library&, const CommandInfo&), не се извежда съобщение, ако артикул с такъв номер не е намерен.
     void removeItemFromCatalog(unsigned id);
 
+    ///Функция, която записва във файла, койтое е определен да съхранява данните за библиотеката, информацията за всеки един артикул, като прескача разделителя. 
+    ///Проверява се дали състоянието на потокът е различно от "good". Всеки елемент от масива използва своя метод за записване във файл с подадения поток.
     void writeInFile() const;
-    void readFromFile();
+    
+    ///Функция, която приема поток и "зарежда" данни от съответния текстов файл. Първо се изчита символът('B'/'S'), указващ типа на съответния артикул.
+    ///След това се създава артикул от съответния тип, изчитат се данните му от файла и се добавя в масива.
+    void readFromFile(std::ifstream& input);
 
+    ///За всеки артикул се извиква съответната функция print().
     void print() const;
 };
 

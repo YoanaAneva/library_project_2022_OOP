@@ -5,7 +5,7 @@ void Series::copy(const Series& other){
     this->issue = other.issue;
 
     this->hasIsbn_issn = other.hasIsbn_issn;
-    strcpy(this->issn, other.issn);
+    this->issn = other.issn;
 
     this->articlesCount = other.articlesCount;
     this->content = new Article[articlesCount];
@@ -19,16 +19,16 @@ void Series::erase(){
     delete[] this->content;
 }
 
-Series::Series() : Paper(){
+Series::Series() : Item(){
     this->type = SERIES;
     this->issue = 1;
-    strcpy(this->issn, "0000-0000");
+    this->issn = "0000-0000";
     this->articlesCount = 0;
     this->content = new Article[0];
 }
 
-Series::Series(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& datePublishing, int issue, Article* content, int articlesCount, const char* issn) : 
-Paper(title, publisher, genre, description, rating, SERIES){
+Series::Series(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& datePublishing, int issue, Article* content, int articlesCount, const String& issn) : 
+Item(title, publisher, genre, description, rating, SERIES){
     this->hasIsbn_issn = true;
     try{
         setDatePublishing(datePublishing);
@@ -46,7 +46,7 @@ Paper(title, publisher, genre, description, rating, SERIES){
 }
 
 Series::Series(const String& title, const String& publisher, const String& genre, const String& description, float rating, const String& datePublishing, int issue, Article* content, int articlesCount) : 
-Paper(title, publisher, genre, description, rating, SERIES){
+Item(title, publisher, genre, description, rating, SERIES){
     this->hasIsbn_issn = false;
     setIssn("0000-0000");
 
@@ -56,20 +56,20 @@ Paper(title, publisher, genre, description, rating, SERIES){
         setContent(content, articlesCount);
     }
     catch(const std::invalid_argument& msg){
-        std::cout << msg.what() << "An object with default value is going to be created!" << std::endl;
+        std::cout << msg.what() << "An object with default values is going to be created!" << std::endl;
         setIssue(1);
         this->articlesCount = 0;
         this->content = new Article[articlesCount];
     }
 }
 
-Series::Series(const Series& other) : Paper(other){
+Series::Series(const Series& other) : Item(other){
     this->copy(other);
 }
 
 Series& Series::operator=(const Series& other){
     if(this != &other){
-        Paper::operator=(other);
+        Item::operator=(other);
         this->erase();
         this->copy(other);
     }
@@ -91,11 +91,11 @@ void Series::setIssue(int issue){
     this->issue = issue;
 }
 
-void Series::setIssn(const char* issn){
+void Series::setIssn(const String& issn){
     if(!isValidIssn(issn)){
         throw "Invalid value for ISSN!";
     }
-    strcpy(this->issn, issn);
+    this->issn = issn;
 }
 
 void Series::setContent(const Article* articles, int articlesCount){
@@ -111,16 +111,16 @@ void Series::setContent(const Article* articles, int articlesCount){
 
 const String& Series::getDatePublishing() const{ return this->datePublishing; }
 unsigned Series::getIssue() const{ return this->issue; }
-const char* Series::getIssn() const{ return this->issn; }
+const String& Series::getIssn() const{ return this->issn; }
 const Article* Series::getContent() const{ return this->content; }
 unsigned Series::getArticlesCount() const{ return this->articlesCount; }
 
-Paper* Series::clone() const{
+Item* Series::clone() const{
     return new Series(*this);
 }
 
 void Series::writeInFile(std::ofstream& output) const{
-    output << "S[" << id << "|" << title << "|" << publisher << "|" << genre << "|" << description << "|" << datePublishing << "|" << issue << "|" << rating << "|" << hasIsbn_issn << "|";
+    output << "S[" << id << "|" << title << "|" << publisher << "|" << genre << "|" << description << "|" << datePublishing << "|" << issue << "|" << rating << "|" << isTaken << "|" << hasIsbn_issn << "|";
     if(hasIsbn_issn){
         output << issn << "|";
     }
@@ -142,43 +142,36 @@ void Series::readFromFile(std::ifstream& input){
 
     input.get(buffer, 2);
 
-    String title, publisher, genre, description, datePublishing;
-    unsigned issue, id, hasIsbn_issn, articlesCount;
+    String title, publisher, genre, description, datePublishing, issn;
+    unsigned issue, id, isTaken, hasIsbn_issn, articlesCount;
     float rating;
 
     input >> id;
     input.get(buffer, 2);
-    // std::cout << id << "|";
 
     input.getline(buffer, bufferLen, '|');
     title = buffer;
-    // std::cout << title << "|";
 
     input.getline(buffer, bufferLen, '|');
     publisher = buffer;
-    // std::cout << publisher << "|";
-
 
     input.getline(buffer, bufferLen, '|');
     genre = buffer;
-    // std::cout << genre << "|";
-
 
     input.getline(buffer, bufferLen, '|');
     description = buffer;
-    // std::cout << description << "|";
  
     input.getline(buffer, bufferLen, '|');
     datePublishing = buffer;
-    // std::cout << datePublishing << "|";
 
     input >> issue;
     input.get(buffer, 2);
-    // std::cout << issue << "|";
 
     input >> rating;
     input.get(buffer, 2);
-    // std::cout << rating << "|";
+  
+    input >> isTaken;
+    input.get(buffer, 2);
 
     input >> hasIsbn_issn;
     input.get(buffer, 2);
@@ -196,7 +189,7 @@ void Series::readFromFile(std::ifstream& input){
     }
 
     input >> articlesCount;
-    // std::cout << articlesCount << std::endl;
+    
     input.getline(buffer, bufferLen);
 
     Article articles[articlesCount];
@@ -220,46 +213,54 @@ void Series::readFromFile(std::ifstream& input){
         setDatePublishing(datePublishing);
         setIssue(issue);
         setRating(rating);
+        setIsTaken(isTaken);
         setHasIsbn_issn(hasIsbn_issn);
         setContent(articles, articlesCount);
     }catch(const char* msg){
-        std::cout << msg << std::endl;
+        std::cout << msg << " Object with deffault values is going to be created" << std::endl;
+        setTitle("Unknown");
+        setPublisher("Unknown");
+        setGenre("Unknown");
+        setDescription("Unknown");
+        setDatePublishing("Unknown");
+        setIssue(1);
+        setRating(1);
     }
 }
 
 void Series::readFromUser(){
-    String yearOfPubl, monthOfPubl, issueStr, articlesCountStr;
+    String yearOfPubl, monthOfPubl, issueStr, articlesCountStr, issn;
     int issue, articlesCount;
     
-    Paper::readFromUser();
+    Item::readFromUser();
 
     if(hasIsbn_issn){
         char issn[10];
         do{
-            std::cout << "Enter ISSN number: ";
-            std::cin.getline(issn, 10);
+            std::cout << "\nEnter ISSN number: ";
+            std::cin >> issn;
         }while(!isValidIssn(issn));
-        strcpy(this->issn, issn);
+        this->issn = issn;
     }
 
     do{
-        std::cout << "Enter year of publishing: ";
+        std::cout << "\nEnter year of publishing: ";
         std::cin >> yearOfPubl;
     }while(!Date::isValidYear(yearOfPubl));
 
     do{
-        std::cout << "Enter month of publishing: ";
+        std::cout << "\nEnter month of publishing: ";
         std::cin >> monthOfPubl;
     }while(!Date::isValidMonth(monthOfPubl));
 
     do{
-        std::cout << "Enter issue: ";
+        std::cout << "\nEnter issue: ";
         std::cin >> issueStr;
         issue = String::convertToNumber(issueStr);
     }while(issue == -1);
     
     do{
-        std::cout << "Enter number of articles: ";
+        std::cout << "\nEnter number of articles: ";
         std::cin >> articlesCountStr;
         articlesCount = String::convertToNumber(articlesCountStr);
     }while(articlesCount == -1);
@@ -281,68 +282,16 @@ void Series::readFromUser(){
     setContent(articles, articlesCount);
 }
 
-// void Periodic::writeInBin(std::ofstream& output){
-//     title.writeInBin(output);
-//     publisher.writeInBin(output);
-//     genre.writeInBin(output);
-//     description.writeInBin(output);
-//     datePublishing.writeInBin(output);
-//     output.write(reinterpret_cast<const char*>(&issue), sizeof(issue));
-//     output.write(reinterpret_cast<const char*>(&rating), sizeof(rating));
-//     output.write(reinterpret_cast<const char*>(&uniqueNumLib), sizeof(uniqueNumLib));
-//     output.write(issn, 10);
-//     output.write(reinterpret_cast<const char*>(&articlesCount), sizeof(articlesCount));
-//     for(int i = 0; i < articlesCount; i++){
-//         content[i].writeInBin(output);
-//     }
-// }
-
-// void Periodic::readFromBin(std::ifstream& input, Periodic& periodic){
-//     String title, publisher, genre, description, datePublishing;
-//     int issue, uniqueNumLib_, articlesCount;
-//     float rating = 0;
-//     char issn[10];
-
-//     String::readFromBin(input, title);
-//     String::readFromBin(input, publisher);
-//     String::readFromBin(input, genre);
-//     String::readFromBin(input, description);
-//     String::readFromBin(input, datePublishing);
-//     input.read(reinterpret_cast<char*>(&issue), sizeof(issue));
-//     input.read(reinterpret_cast<char*>(&rating), sizeof(rating));
-//     input.read(reinterpret_cast<char*>(&uniqueNumLib_), sizeof(uniqueNumLib_));
-//     input.read(issn, 10);
-//     input.read(reinterpret_cast<char*>(&articlesCount), sizeof(articlesCount));
-
-//     Article* as = new Article[articlesCount];
-
-//     for(int i = 0; i < articlesCount; i++){
-//         as[i].readFromBin(input);
-//     }
-
-//     periodic.setTitle(title);
-//     periodic.setPublisher(publisher);
-//     periodic.setGenre(genre);
-//     periodic.setDescription(description);
-//     periodic.setDatePublishing(datePublishing);
-//     periodic.setIssue(issue);
-//     periodic.setRating(rating);
-//     Periodic::setUniqueNumLib(uniqueNumLib_);
-//     periodic.setIssn(issn);
-//     periodic.setContent(as, articlesCount);
-//     delete[] as;
-// }
-
-bool Series::isValidIssn(const char* issn){
-    if(strlen(issn) != 9 || !isdigit(issn[0]) || !isdigit(issn[1]) || !isdigit(issn[2]) || !isdigit(issn[3]) || !isdigit(issn[5]) || !isdigit(issn[6]) || !isdigit(issn[7]) || !isdigit(issn[8]) || issn[4] != '-'){
-        std::cout << "Invalid value for ISSN!" << std::endl;
+bool Series::isValidIssn(const String& issn){
+    if(issn.getSize() != 9 || !isdigit(issn[0]) || !isdigit(issn[1]) || !isdigit(issn[2]) || !isdigit(issn[3]) || !isdigit(issn[5]) || !isdigit(issn[6]) || !isdigit(issn[7]) || !isdigit(issn[8]) || issn[4] != '-'){
+        std::cout << "\nInvalid value for ISSN! should have form: 0000-0000 where 0 can be any number\n\n";
         return false;
     }
     return true;
 }
 
 void Series::print() const{
-    Paper::print();
+    Item::print();
     std::cout << datePublishing << '|' << issue << '|' << (hasIsbn_issn ? issn : "") << std::endl << "Content:" << std::endl;
     for(int i = 0; i < articlesCount; i++){
         content[i].print();
@@ -363,18 +312,6 @@ const String& Article::getAuthor() const{
 const String& Article::getKeywords() const{
     return this->keywords;
 }
-
-// void Article::writeInBin(std::ofstream& output){
-//         header.writeInBin(output);
-//         author.writeInBin(output);
-//         keywords.writeInBin(output);
-//     }
-
-// void Article::readFromBin(std::ifstream& input){
-//         String::readFromBin(input, this->header);
-//         String::readFromBin(input, this->author);
-//         String::readFromBin(input, this->keywords);
-//     }
 
 void Article::print() const{
         std::cout << "{" << header << '|' << author << '|' << keywords << "}" << std::endl;
@@ -404,17 +341,17 @@ void Article::readFromUser(){
     String header, author, keywords;
 
     do{
-        std::cout << "Enter article header: ";
+        std::cout << "\nEnter article header: ";
         std::cin >> header;
     }while(header == "" || header == " ");
 
     do{
-        std::cout << "Enter article author: ";
+        std::cout << "\nEnter article author: ";
         std::cin >> author;
     }while(author == "" || author == " ");
 
     do{
-        std::cout << "Enter article keywords: ";
+        std::cout << "\nEnter article keywords: ";
         std::cin >> keywords;
     }while(keywords == "" || keywords == " ");
 
@@ -422,26 +359,3 @@ void Article::readFromUser(){
     this->author = author;
     this->keywords = keywords;
 }
-
-// BorrowedSeries::BorrowedSeries(const String& title, const String& publisher, const String& genre, const String& description, float rating, 
-//     const String& datePublishing, int issue, Article* content, int articlesCount, const char* issn, const Date& checkoutDate, const Date& returnDate) : 
-//     Paper(title, publisher, genre, description, rating, SERIES),
-//     Series(title, publisher, genre, description, rating, datePublishing, issue, content, articlesCount, issn),
-//     BorrowedPaper(title, publisher, genre, description, rating, SERIES, checkoutDate, returnDate) {}
-
-
-// BorrowedSeries::BorrowedSeries(const String& title, const String& publisher, const String& genre, const String& description, float rating, 
-//     const String& datePublishing, int issue, Article* content, int articlesCount, const Date& checkoutDate, const Date& returnDate) : 
-//     Paper(title, publisher, genre, description, rating, SERIES),
-//     Series(title, publisher, genre, description, rating, datePublishing, issue, content, articlesCount),
-//     BorrowedPaper(title, publisher, genre, description, rating, SERIES, checkoutDate, returnDate) {}
-
-
-// BorrowedPaper* BorrowedSeries::clone() const{
-//     return new BorrowedSeries(*this);
-// }
-
-// void BorrowedSeries::print() const{
-//     Series::print();
-//     std::cout << checkoutDate << "|" << returnDate << std::endl;
-// }
